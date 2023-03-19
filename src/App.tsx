@@ -1,11 +1,7 @@
+import RegisterScreen from './screens/Register';
+
 function App() {
-  return (
-    <div>
-      <h1 className='text-3xl text-primary font-bold underline'>
-        Hello world!
-      </h1>
-    </div>
-  );
+  return <RegisterScreen />;
 }
 
 export default App;
