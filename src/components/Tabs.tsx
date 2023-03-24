@@ -22,18 +22,19 @@ const Tabs: React.FC<TabsProps> = ({
   onChange,
 }) => {
   const tabActiveVariantClassMap: Record<TabsVariant, string> = {
-    default: 'font-bold text-white py-3 px-6 bg-primary',
+    default:
+      'font-bold text-primary py-3 px-6 bg-primary bg-opacity-10 rounded-t-xl shadow-inner',
   };
 
   const tabInActiveVariantClassMap: Record<TabsVariant, string> = {
-    default: 'font-bold text-dark-9 py-3 px-6 rounded-full bg-white',
+    default: 'font-bold text-dark-9 py-3 px-6 bg-white',
   };
 
   return (
     <div className='flex flex-col'>
       <div
         className={classNames(
-          'flex-grow overflow-x-auto flex flex-row space-x-3'
+          'flex-grow overflow-x-auto flex flex-row space-x-3 bg-white shadow-sm sticky top-0'
         )}
       >
         {tabs.map(({ name }, index) => {
@@ -55,9 +56,12 @@ const Tabs: React.FC<TabsProps> = ({
           );
         })}
       </div>
-      <Fragment key={selectedIndex}>
+      <div
+        key={selectedIndex}
+        className='flex-grow bg-primary bg-opacity-10 overflow-y-scroll'
+      >
         {tabs[selectedIndex].TabComponent}
-      </Fragment>
+      </div>
     </div>
   );
 };
