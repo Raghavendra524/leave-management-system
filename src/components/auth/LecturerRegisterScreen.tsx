@@ -28,11 +28,11 @@ const LecturerRegisterScreen: React.FC<LecturerRegisterScreenProps> = () => {
 
   return (
     <div className='px-4 py-6 flex items-center justify-center'>
-      <div className='bg-white flex flex-col items-start justify-center md:w-1/2 w-full md:shadow-xl rounded-2xl'>
+      <div className='bg-white flex flex-col items-start justify-center md:w-1/2 w-full md:shadow-xl rounded-2xl py-6'>
         <h1 className='text-xl font-bold text-primary my-3 self-center'>
           Register
         </h1>
-        <div className='overflow-y-scroll w-full px-4 py-6'>
+        <div className='overflow-y-scroll w-full md:px-12 px-4'>
           <div className='mt-5'>
             <ControlledTextInput<FormData, 'facultyId'>
               name='facultyId'
@@ -128,7 +128,7 @@ const LecturerRegisterScreen: React.FC<LecturerRegisterScreenProps> = () => {
             />
           </div>
         </div>
-        <div className='mt-5 w-full flex justify-end px-4 py-5'>
+        <div className='mt-5 w-full flex justify-end md:px-12 px-4 py-3'>
           <Button label='Register' onClick={handleSubmit(onSubmit)} />
         </div>
       </div>
