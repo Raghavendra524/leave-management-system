@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import LecturerRegisterScreen from '../components/auth/LecturerRegisterScreen';
 import StudentRegisterScreen from '../components/auth/StudentRegisterScreen';
+import Layout from '../components/Layout';
 import Tabs, { Tab } from '../components/Tabs';
 
 interface RegisterScreenProps {}
@@ -23,11 +24,13 @@ const RegisterScreen: React.FC<RegisterScreenProps> = () => {
   );
 
   return (
-    <Tabs
-      tabs={tabs}
-      selectedIndex={selectedTabIndex}
-      onChange={setSelectedTabIndex}
-    />
+    <Layout>
+      <Tabs
+        tabs={tabs}
+        selectedIndex={selectedTabIndex}
+        onChange={setSelectedTabIndex}
+      />
+    </Layout>
   );
 };
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 import { BranchesEnum } from '../../types';
 import { getSpecializationValues } from '../../utils/RegisterUtils';
 import { capitalizeEnum } from '../../utils/StringUtils';
@@ -29,6 +30,7 @@ interface FormData {
 }
 
 const StudentRegisterScreen: React.FC<StudentRegisterScreenProps> = () => {
+  const navigate = useNavigate();
   const { control, handleSubmit, getValues, watch } = useForm<FormData>();
 
   const spyDepartment = watch('department');
@@ -217,7 +219,16 @@ const StudentRegisterScreen: React.FC<StudentRegisterScreenProps> = () => {
             />
           </div>
         </div>
-        <div className='mt-5 w-full flex justify-end md:px-12 px-4 py-3'>
+        <div className='mt-5 w-full flex flex-col items-end md:px-12 px-4 py-3 space-y-3'>
+          <span>
+            Already User?{' '}
+            <button
+              onClick={() => navigate('/login')}
+              className='font-sans text-primary text-base leading-5 font-medium'
+            >
+              Login
+            </button>
+          </span>
           <Button label='Register' onClick={handleSubmit(onSubmit)} />
         </div>
       </div>
