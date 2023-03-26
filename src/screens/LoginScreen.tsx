@@ -1,8 +1,12 @@
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import ControlledTextInput from '../components/controlled-inputs/ControlledTextInput';
 import Layout from '../components/Layout';
+import { DefaultFacultyResponse } from '../fixtures/api/DefaultFacultyResponse';
+import { DefaultStudentResponse } from '../fixtures/api/DefaultStudentResponse';
+import { saveUserResponse } from '../slices/AuthSlice';
 import { PASSWORD_VALIDATIONS } from '../utils/validations';
 
 interface FormData {
@@ -12,10 +16,31 @@ interface FormData {
 
 const LoginScreen = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const { control, handleSubmit } = useForm<FormData>();
 
-  const onSubmit = (formData: FormData) => {
-    console.log('Data:', formData);
+  const onSubmit = async (formData: FormData) => {
+    const { userIdOrEmail, password } = formData;
+    if (userIdOrEmail === '001' && password === 'P@ssw0rd') {
+      await dispatch(
+        saveUserResponse({
+          loading: false,
+          name: 'details',
+          data: DefaultFacultyResponse,
+        })
+      );
+      navigate('/');
+    } else if (userIdOrEmail === '0001' && password === 'P@ssw0rd') {
+      await dispatch(
+        saveUserResponse({
+          loading: false,
+          name: 'details',
+          data: DefaultStudentResponse,
+        })
+      );
+      navigate('/');
+    }
   };
 
   return (
