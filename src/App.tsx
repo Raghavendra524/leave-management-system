@@ -1,11 +1,13 @@
-import Layout from './components/Layout';
-import RegisterScreen from './screens/Register';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import DecideAuthRoutes from './routes/DecideAuthRoutes';
 
 function App() {
   return (
-    <Layout>
-      <RegisterScreen />
-    </Layout>
+    <BrowserRouter>
+      <Routes>
+        <Route path='*' element={<DecideAuthRoutes />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
