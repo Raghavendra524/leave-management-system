@@ -49,6 +49,7 @@ CREATE TABLE Leave_Application (
     document_attached boolean default 0,
     document blob,
     status varchar(10) default 'pending',
+    status_comment text,
     created_on TIMESTAMP default current_timestamp,
     isdeleted boolean default 0,
     CONSTRAINT PK_leave PRIMARY KEY (id),
@@ -60,8 +61,11 @@ desc Student;
 desc Faculty;
 desc Leave_Application;
 
-drop table Student;
 drop table Faculty;
+drop table Student;
 drop table Leave_Application;
 
 select * from Student;
+select * from Faculty;
+
+

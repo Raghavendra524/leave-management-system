@@ -1,7 +1,9 @@
 require("dotenv").config();
 const express = require("express");
-const appRoutes = require("./routes/leaveApp");
+const studentActionRoutes = require("./routes/studentAction");
 const studentUserRoutes = require("./routes/studentUser");
+const facultyUserRoutes = require("./routes/facultyUser");
+const FacultyActionRoutes = require("./routes/facultyAction");
 const app = express();
 
 // middlewares
@@ -13,8 +15,10 @@ app.use((req, res, next) => {
 });
 
 // routes
-app.use("/apiv1/leaveapp/", appRoutes);
 app.use("/apiv1/student/", studentUserRoutes);
+app.use("/apiv1/faculty/", facultyUserRoutes);
+app.use("/apiv1/studentaction/", studentActionRoutes);
+app.use("/apiv1/facultyaction/", FacultyActionRoutes);
 
 // listen for request
 app.listen(process.env.PORT, () => {

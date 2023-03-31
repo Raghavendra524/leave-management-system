@@ -18,7 +18,7 @@ const login = async function (email, password) {
   }
 
   const user_id = await connection.query(
-    "select id,password from Student where email_id = ? and isdeleted = 0;",
+    "select id,password from Faculty where email_id = ? and isdeleted = 0;",
     email
   );
 
@@ -49,16 +49,11 @@ const loginUser = async (req, res) => {
 
 // helping signup method for user
 const signup = async (
-  roll_no,
   name,
   mobile_no,
   email,
   password,
   department,
-  faculty_id,
-  degree,
-  specialization,
-  entrance
 ) => {
   // validation
   if (!email) {
@@ -77,66 +72,32 @@ const signup = async (
   }
 
   const user_id = await connection.query(
-    "select id from Student where email_id = ? and isdeleted = 0;",
+    "select id from Faculty where email_id = ? and isdeleted = 0;",
     email
   );
-  // console.log(user_id);
 
   if (user_id[0].length) {
-    throw Error(`Email already in use or contact respected teacher`);
+    throw Error("Email already in use");
   }
   // password encryption
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(password, salt);
 
   let sql =
-    "insert into Student (roll_no,name,mobile_no,email_id,password,department,faculty_id,degree,specialization,entrance) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ;";
-  let values = [
-    roll_no,
-    name,
-    mobile_no,
-    email,
-    hash,
-    department,
-    faculty_id,
-    degree,
-    specialization,
-    entrance,
-  ];
+    "insert into Faculty (name,mobile_no,email_id,password,department) values (?, ?, ?, ?, ?) ;";
+  let values = [name, mobile_no, email, hash, department];
 
-  // console.log(values);
+//   console.log(values);
   const id = await connection.query(sql, values);
-  // console.log(id);
+//   console.log(id);
   return id.insertId;
 };
 
 // main signupuser method
 const signupUser = async (req, res) => {
-  const {
-    roll_no,
-    name,
-    mobile_no,
-    email,
-    password,
-    department,
-    faculty_id,
-    degree,
-    specialization,
-    entrance,
-  } = req.body;
+  const { name, mobile_no, email, password, department } = req.body;
   try {
-    const user_id = await signup(
-      roll_no,
-      name,
-      mobile_no,
-      email,
-      password,
-      department,
-      faculty_id,
-      degree,
-      specialization,
-      entrance
-    );
+    const user_id = await signup(name, mobile_no, email, password, department);
 
     // create token
     // console.log(user_id);
@@ -148,21 +109,7 @@ const signupUser = async (req, res) => {
   }
 };
 
-// get list of all faculty
-const getFacultyList = async (req, res) => {
-  const faculty = await connection.query("select id,name from Faculty ;");
-  // console.log(faculty[0]);
-  res.json({ data: faculty[0] });
-};
-
-// update profile
-
-const updateProfile = async (req, res) => {
-  res.status(200).json("profile is updated");
-};
 module.exports = {
   loginUser,
   signupUser,
-  getFacultyList,
-  updateProfile,
 };
