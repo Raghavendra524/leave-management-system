@@ -15,7 +15,7 @@ CREATE TABLE Faculty (
     CONSTRAINT PK_faculty PRIMARY KEY (id)
 );
 
-
+# entrance types are : GATE , QIP, QIP(Poly), Sponsored
 CREATE TABLE Student (
 	id INT NOT NULL auto_increment ,
     roll_no varchar(10) NOT NULL,
@@ -36,6 +36,8 @@ CREATE TABLE Student (
     CONSTRAINT FK_Faculty FOREIGN KEY (faculty_id) REFERENCES Faculty(id)
 );
 
+# status : pending, rejected, approved
+# leave_types : medical_leave, casual_leave , permission_to_attend_conference
 CREATE TABLE Leave_Application (
 	id INT NOT NULL auto_increment ,
     s_id INT NOT NULL ,
@@ -44,7 +46,6 @@ CREATE TABLE Leave_Application (
     no_of_leaves INT NOT NULL,
     starting_date DATE NOT NULL,
     ending_date DATE NOT NULL,
-    reason_title varchar(70) NOT NULL,
     reason text NOT NULL,
     document_attached boolean default 0,
     document blob,
@@ -61,11 +62,9 @@ desc Student;
 desc Faculty;
 desc Leave_Application;
 
-drop table Faculty;
-drop table Student;
-drop table Leave_Application;
-
 select * from Student;
 select * from Faculty;
+select * from Leave_Application;
+
 
 

@@ -47,13 +47,41 @@ const updateStatusOfLeaveApplication = async (req, res) => {
       req.Facultyuser,
     ];
     const updated_obj = await connection.query(sql, values);
-    console.log(updated_obj);
-    res
-      .status(200)
-      .json({
-        updated: true,
-        data: `you changed status to ['${status}'] and write comment : ['${status_comment}'] for that.`,
-      });
+    const leave_app_obj = await connection.query(
+      `select * from Leave_Application where id = ?;`,
+      leave_application_id
+    );
+    const leave_obj = leave_app_obj[0][0];
+    const student_id = leave_obj.s_id;
+    const leave_type = leave_obj.leave_type;
+    const fetch_student_obj = await connection.query(
+      `select * from Student where id = ?`,
+      student_id
+    );
+    const student_obj = fetch_student_obj[0][0];
+    // console.log(student_obj);
+    // if medical_leave
+    if (leave_type === "medical_leave") {
+      const remaining_medical_leave =
+        student_obj.remaining_medical_leave - leave_obj.no_of_leaves;
+      const update_medical_leave = connection.query(
+        `update Student set remaining_medical_leave = ? where id = ?; `,
+        [remaining_medical_leave, student_id]
+      );
+    } else if (leave_type === "casual_leave") {
+      const remaining_casual_leave =
+        student_obj.remaining_casual_leave - leave_obj.no_of_leaves;
+      const update_casual_leave = connection.query(
+        `update Student set remaining_casual_leave = ? where id = ?; `,
+        [remaining_casual_leave, student_id]
+      );
+    }
+    // if casual_leave
+    // const update_remaining_leaves = null;
+    res.status(200).json({
+      updated: true,
+      data: `you changed status to ['${status}'] and write comment : ['${status_comment}'] for that.`,
+    });
   } catch (err) {
     res.status(401).json({ data: `error in updation : ${err}` });
   }
@@ -79,12 +107,10 @@ const deleteAllApplicationForm = async (req, res) => {
       "delete from Leave_Application where f_id = ?",
       req.Facultyuser
     );
-    res
-      .status(200)
-      .json({
-        deleted: true,
-        data: "all applications are permenetaly deleted and can't restore.",
-      });
+    res.status(200).json({
+      deleted: true,
+      data: "all applications are permenetaly deleted and can't restore.",
+    });
   } catch (err) {
     res.status(401).json({ data: "error in deletation", error: err });
   }
