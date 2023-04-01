@@ -21,10 +21,10 @@ router.get("/applicationform/:id", getSingleApplicationForm);
 // POST new application
 router.post("/newapplication", createApplicationForm);
 
-// DELETE a application
-router.post("/deleteapplication", updateApplicationForm);
-
 // update a application
-router.post("/updateapplication", tempDeleteApplicationForm);
+router.post("/updateapplication", updateApplicationForm);
+
+// DELETE a application
+router.post("/deleteapplication", tempDeleteApplicationForm);
 
 module.exports = router;

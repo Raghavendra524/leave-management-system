@@ -105,9 +105,10 @@ const signup = async (
   ];
 
   // console.log(values);
-  const id = await connection.query(sql, values);
+  const student_obj = await connection.query(sql, values);
+  const id = student_obj.insertId;
   // console.log(id);
-  return id.insertId;
+  return id;
 };
 
 // main signupuser method
@@ -158,6 +159,7 @@ const getFacultyList = async (req, res) => {
 // update profile
 
 const updateProfile = async (req, res) => {
+  // not implemented because some-one can do pranks so i'll implement after concern.
   res.status(200).json("profile is updated");
 };
 module.exports = {
