@@ -1,31 +1,66 @@
-import React from 'react';
+import axios from 'axios';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import ErrorService from '../../services/ErrorService';
+import { getAllFacultyApplications } from '../../slices/AuthSlice';
+import { AppDispatch, BranchesEnum } from '../../types';
+import { setAuthCookie } from '../../utils/ApiUtils';
+import { capitalizeEnum } from '../../utils/StringUtils';
 import {
   EMAIL_VALIDATIONS,
   PASSWORD_VALIDATIONS,
   PHONE_NUMBER_VALIDATIONS,
 } from '../../utils/validations';
 import Button from '../Button';
+import ControlledHTMLSelectInput from '../controlled-inputs/ControlledHTMLSelectInput';
 import ControlledTextInput from '../controlled-inputs/ControlledTextInput';
 
 interface LecturerRegisterScreenProps {}
 
 interface FormData {
-  facultyId: string;
   facultyName: string;
   mobileNumber: string;
   emailId: string;
+  department: string;
   password: string;
   cPassword: string;
+  submit: string;
 }
 
 const LecturerRegisterScreen: React.FC<LecturerRegisterScreenProps> = () => {
+  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
-  const { control, handleSubmit, getValues } = useForm<FormData>();
+  const { control, handleSubmit, getValues, setValue } = useForm<FormData>();
 
-  const onSubmit = (formData: FormData) => {
-    console.log('Data:', formData);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>();
+
+  const onSubmit = async (formData: FormData) => {
+    const { facultyName, emailId, mobileNumber, password, department } =
+      formData;
+    setIsSubmitting(true);
+    await axios({
+      method: 'post',
+      url: 'https://leavemangement.onrender.com/apiv1/faculty/signup',
+      data: {
+        name: facultyName,
+        mobile_no: mobileNumber,
+        email: emailId,
+        password: password,
+        department: department,
+      },
+    })
+      .then(async (res) => {
+        setAuthCookie(res.data.token);
+        dispatch(getAllFacultyApplications(res.data.token));
+        navigate('/');
+      })
+      .catch((e) => {
+        setValue('submit', e);
+        ErrorService.notify('Problem in fetching request token', e);
+      })
+      .finally(() => setIsSubmitting(false));
   };
 
   return (
@@ -35,19 +70,6 @@ const LecturerRegisterScreen: React.FC<LecturerRegisterScreenProps> = () => {
           Register
         </h1>
         <div className='overflow-y-scroll w-full md:px-12 px-4'>
-          <div className='mt-5'>
-            <ControlledTextInput<FormData, 'facultyId'>
-              name='facultyId'
-              label='Faculty Id'
-              control={control}
-              placeholder='Please enter Id'
-              shouldUnregister={false}
-              rules={{
-                required: 'Please enter your Id',
-              }}
-              isRequired
-            />
-          </div>
           <div className='mt-5'>
             <ControlledTextInput<FormData, 'facultyName'>
               label='Faculty Full Name'
@@ -99,6 +121,23 @@ const LecturerRegisterScreen: React.FC<LecturerRegisterScreenProps> = () => {
             />
           </div>
           <div className='mt-5'>
+            <ControlledHTMLSelectInput<FormData, 'department'>
+              name='department'
+              control={control}
+              label='Department'
+              placeholder='Select Department'
+              rules={{ required: 'Please select department' }}
+              options={[
+                { label: 'Select', value: '' },
+                ...Object.values(BranchesEnum).map((b) => ({
+                  label: capitalizeEnum(b),
+                  value: b,
+                })),
+              ]}
+              isRequired
+            />
+          </div>
+          <div className='mt-5'>
             <ControlledTextInput<FormData, 'password'>
               label='Password'
               name='password'
@@ -141,7 +180,11 @@ const LecturerRegisterScreen: React.FC<LecturerRegisterScreenProps> = () => {
               Login
             </button>
           </span>
-          <Button label='Register' onClick={handleSubmit(onSubmit)} />
+          <Button
+            label='Register'
+            onClick={handleSubmit(onSubmit)}
+            isSubmitting={isSubmitting}
+          />
         </div>
       </div>
     </div>

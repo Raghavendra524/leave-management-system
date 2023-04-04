@@ -1,3 +1,4 @@
+import { Action, ThunkAction } from '@reduxjs/toolkit';
 import rootReducer from './slices/rootReducer';
 import store from './slices/store';
 
@@ -19,6 +20,13 @@ export enum BranchesEnum {
   EEE = 'EEE',
   CIVIL = 'CIVIL',
 }
+
+export type AppThunk<ReturnType = void> = ThunkAction<
+  ReturnType,
+  RootState,
+  unknown,
+  Action<string>
+>;
 
 export type AppDispatch = typeof store.dispatch;
 

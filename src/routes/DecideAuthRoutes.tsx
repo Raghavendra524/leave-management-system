@@ -1,21 +1,15 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
+import { getAuthCookie } from '../utils/ApiUtils';
 import AuthRoutes from './AuthRoutes';
-import { useSelector } from 'react-redux';
 import GuestRoutes from './GuestRoutes';
-import { RootState } from '../types';
 
 const DecideAuthRoutes: React.FC = () => {
-  const {
-    userResponse: { data: userDetails },
-  } = useSelector((state: RootState) => state.auth);
+  const token = getAuthCookie();
 
   return (
     <Routes>
-      <Route
-        path='*'
-        element={!!userDetails ? <AuthRoutes /> : <GuestRoutes />}
-      />
+      <Route path='*' element={!!token ? <AuthRoutes /> : <GuestRoutes />} />
     </Routes>
   );
 };
