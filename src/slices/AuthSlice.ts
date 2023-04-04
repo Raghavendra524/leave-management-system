@@ -5,6 +5,7 @@ import { AppThunk, AuthState, UserTypeEnum } from '../types';
 
 export const initialState: AuthState = {
   role: undefined,
+  appLoading: false,
 };
 
 const authSlice = createSlice({
@@ -14,10 +15,13 @@ const authSlice = createSlice({
     saveUserRoleResponse(state, action: PayloadAction<UserTypeEnum>) {
       state.role = action.payload;
     },
+    saveAppLoading(state, action: PayloadAction<boolean>) {
+      state.appLoading = action.payload;
+    },
   },
 });
 
-export const { saveUserRoleResponse } = authSlice.actions;
+export const { saveUserRoleResponse, saveAppLoading } = authSlice.actions;
 
 export const getAllFacultyApplications =
   (token: string): AppThunk =>
@@ -35,8 +39,9 @@ export const getAllFacultyApplications =
   };
 
 export const getAllStudentApplications =
-  (token: string): AppThunk =>
+  (token: string, onFetch?: boolean): AppThunk =>
   async (dispatch) => {
+    dispatch(saveAppLoading(true));
     try {
       const { data } = await axios({
         method: 'get',
@@ -45,7 +50,12 @@ export const getAllStudentApplications =
       });
       dispatch(saveUserRoleResponse(data.role));
     } catch (e: any) {
+      if (onFetch) {
+        dispatch(getAllFacultyApplications(token));
+      }
       ErrorService.notify('Unable to fetch applications', e);
+    } finally {
+      dispatch(saveAppLoading(false));
     }
   };
 

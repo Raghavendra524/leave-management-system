@@ -98,4 +98,5 @@ export interface FacultyResponse {
 
 export interface AuthState {
   role?: UserTypeEnum;
+  appLoading: boolean;
 }
