@@ -1,46 +1,68 @@
+import axios from 'axios';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Button from '../components/Button';
 import ControlledTextInput from '../components/controlled-inputs/ControlledTextInput';
 import Layout from '../components/Layout';
-import { DefaultFacultyResponse } from '../fixtures/api/DefaultFacultyResponse';
-import { DefaultStudentResponse } from '../fixtures/api/DefaultStudentResponse';
-import { saveUserResponse } from '../slices/AuthSlice';
+import ErrorService from '../services/ErrorService';
+import {
+  getAllFacultyApplications,
+  getAllStudentApplications,
+  saveUserRoleResponse,
+} from '../slices/AuthSlice';
+import { AppDispatch } from '../types';
+import { setAuthCookie } from '../utils/ApiUtils';
 import { PASSWORD_VALIDATIONS } from '../utils/validations';
 
 interface FormData {
   userIdOrEmail: string;
   password: string;
+  submit: string;
 }
 
 const LoginScreen = () => {
+  const { user } = useParams();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
 
-  const { control, handleSubmit } = useForm<FormData>();
+  const { control, handleSubmit, setValue } = useForm<FormData>();
+
+  const [isSubmitting, setIsSubmitting] = useState<boolean>();
 
   const onSubmit = async (formData: FormData) => {
     const { userIdOrEmail, password } = formData;
-    if (userIdOrEmail === '001' && password === 'P@ssw0rd') {
-      await dispatch(
-        saveUserResponse({
-          loading: false,
-          name: 'details',
-          data: DefaultFacultyResponse,
-        })
-      );
-      navigate('/');
-    } else if (userIdOrEmail === '0001' && password === 'P@ssw0rd') {
-      await dispatch(
-        saveUserResponse({
-          loading: false,
-          name: 'details',
-          data: DefaultStudentResponse,
-        })
-      );
-      navigate('/');
-    }
+    setIsSubmitting(true);
+    await axios({
+      method: 'post',
+      url: `https://leavemangement.onrender.com/apiv1/${user}/login`,
+      data: {
+        email: userIdOrEmail,
+        password: password,
+      },
+    })
+      .then(async (res) => {
+        const {
+          data: { token, role },
+        } = res;
+        setAuthCookie(token);
+        dispatch(saveUserRoleResponse(role));
+        if (role === 'FACULTY') {
+          dispatch(getAllFacultyApplications(token));
+        } else if (role === 'STUDENT') {
+          dispatch(getAllStudentApplications(token));
+        }
+        navigate('/');
+      })
+      .catch((e) => {
+        setValue('submit', e);
+        ErrorService.notify('Problem in fetching request token', e);
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+        navigate('/');
+      });
   };
 
   return (
@@ -89,7 +111,11 @@ const LoginScreen = () => {
                 Register
               </button>
             </span>
-            <Button label='Login' onClick={handleSubmit(onSubmit)} />
+            <Button
+              label='Login'
+              onClick={handleSubmit(onSubmit)}
+              isSubmitting={isSubmitting}
+            />
           </div>
         </div>
       </div>

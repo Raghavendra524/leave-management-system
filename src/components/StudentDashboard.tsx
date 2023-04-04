@@ -1,13 +1,8 @@
-import { useSelector } from 'react-redux';
-import { RootState, StudentResponse } from '../types';
+import { DefaultStudentResponse } from '../fixtures/api/DefaultStudentResponse';
 import Button from './Button';
 import Layout from './Layout';
 
 const StudentDashboard = () => {
-  const {
-    userResponse: { data: userDetails },
-  } = useSelector((state: RootState) => state.auth);
-
   return (
     <Layout>
       <div className='w-full flex items-center justify-center'>
@@ -26,7 +21,7 @@ const StudentDashboard = () => {
               <th>Leave To</th>
               <th>Status</th>
             </tr>
-            {((userDetails as StudentResponse).leaves || []).map((leave) => {
+            {(DefaultStudentResponse.leaves || []).map((leave) => {
               const { desc, from, status, title, to } = leave;
               return (
                 <tr>
