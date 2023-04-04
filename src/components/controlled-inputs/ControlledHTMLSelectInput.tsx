@@ -95,7 +95,11 @@ const ControlledHTMLSelectInput = <
               )}
             >
               {options.map(({ value, label, disabled }) => (
-                <option key={value} value={value} disabled={disabled}>
+                <option
+                  key={[value, label].join(',')}
+                  value={value}
+                  disabled={disabled}
+                >
                   {label}
                 </option>
               ))}

@@ -1,7 +1,12 @@
-import React from 'react';
+import axios from 'axios';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { BranchesEnum } from '../../types';
+import ErrorService from '../../services/ErrorService';
+import { getAllStudentApplications } from '../../slices/AuthSlice';
+import { AppDispatch, BranchesEnum, FacultyListResponse } from '../../types';
+import { setAuthCookie } from '../../utils/ApiUtils';
 import { getSpecializationValues } from '../../utils/RegisterUtils';
 import { capitalizeEnum } from '../../utils/StringUtils';
 import {
@@ -27,17 +32,81 @@ interface FormData {
   entrance: string;
   password: string;
   cPassword: string;
+  submit: string;
 }
 
 const StudentRegisterScreen: React.FC<StudentRegisterScreenProps> = () => {
+  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
-  const { control, handleSubmit, getValues, watch } = useForm<FormData>();
+  const { control, handleSubmit, getValues, watch, setValue } =
+    useForm<FormData>();
 
   const spyDepartment = watch('department');
 
-  const onSubmit = (formData: FormData) => {
-    console.log('Data:', formData);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>();
+  const [faculty, setFaculty] = useState<FacultyListResponse[]>([]);
+
+  console.log('Faculty:', faculty);
+
+  const onSubmit = async (formData: FormData) => {
+    const {
+      degree,
+      department,
+      email,
+      entrance,
+      facultyId,
+      mobileNumber,
+      password,
+      specialization,
+      studentId,
+      studentName,
+    } = formData;
+
+    setIsSubmitting(true);
+    await axios({
+      method: 'post',
+      url: 'https://leavemangement.onrender.com/apiv1/student/signup',
+      data: {
+        roll_no: studentId,
+        name: studentName,
+        mobile_no: mobileNumber,
+        email: email,
+        password: password,
+        department: department,
+        faculty_id: facultyId,
+        degree: degree,
+        specialization: specialization,
+        entrance: entrance,
+      },
+    })
+      .then(async (res) => {
+        setAuthCookie(res.data.token);
+        dispatch(getAllStudentApplications(res.data.token));
+        navigate('/');
+      })
+      .catch((e) => {
+        setValue('submit', e);
+        ErrorService.notify('Problem in fetching request token', e);
+      })
+      .finally(() => setIsSubmitting(false));
   };
+
+  const getFacultyDetails = useCallback(async () => {
+    await axios({
+      method: 'get',
+      url: 'https://leavemangement.onrender.com/apiv1/student/facultylist',
+    })
+      .then(async (res) => {
+        setFaculty(res.data.data);
+      })
+      .catch((e) => {
+        ErrorService.notify('Problem in fetching faculty response', e);
+      });
+  }, []);
+
+  useEffect(() => {
+    getFacultyDetails();
+  }, [getFacultyDetails]);
 
   return (
     <div className='px-4 py-6 flex items-center justify-center'>
@@ -134,8 +203,10 @@ const StudentRegisterScreen: React.FC<StudentRegisterScreenProps> = () => {
               rules={{ required: 'Please select your faculty' }}
               options={[
                 { label: 'Select', value: '' },
-                { label: 'Padmabushan', value: '001' },
-                { label: 'Murali', value: '002' },
+                ...(faculty || []).map((fac) => ({
+                  label: fac.name,
+                  value: fac.id,
+                })),
               ]}
               isRequired
             />
@@ -229,7 +300,11 @@ const StudentRegisterScreen: React.FC<StudentRegisterScreenProps> = () => {
               Login
             </button>
           </span>
-          <Button label='Register' onClick={handleSubmit(onSubmit)} />
+          <Button
+            label='Register'
+            onClick={handleSubmit(onSubmit)}
+            isSubmitting={isSubmitting}
+          />
         </div>
       </div>
     </div>

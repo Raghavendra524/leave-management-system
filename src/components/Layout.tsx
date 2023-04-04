@@ -9,7 +9,7 @@ const Layout: React.FC<Props> = ({ children }) => {
   return (
     <div className='flex flex-col w-screen min-h-screen max-h-screen'>
       <Header />
-      <div className='md:overflow-y-scroll'>{children}</div>
+      <div className='md:overflow-y-scroll flex-1'>{children}</div>
     </div>
   );
 };

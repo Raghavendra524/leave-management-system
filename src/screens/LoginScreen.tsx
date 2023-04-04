@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Button from '../components/Button';
 import ControlledTextInput from '../components/controlled-inputs/ControlledTextInput';
 import Layout from '../components/Layout';
@@ -23,6 +23,7 @@ interface FormData {
 }
 
 const LoginScreen = () => {
+  const { user } = useParams();
   const navigate = useNavigate();
   const dispatch: AppDispatch = useDispatch();
 
@@ -35,7 +36,7 @@ const LoginScreen = () => {
     setIsSubmitting(true);
     await axios({
       method: 'post',
-      url: 'https://leavemangement.onrender.com/apiv1/faculty/login',
+      url: `https://leavemangement.onrender.com/apiv1/${user}/login`,
       data: {
         email: userIdOrEmail,
         password: password,

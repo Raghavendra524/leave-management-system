@@ -100,3 +100,8 @@ export interface AuthState {
   role?: UserTypeEnum;
   appLoading: boolean;
 }
+
+export interface FacultyListResponse {
+  id: string;
+  name: string;
+}
