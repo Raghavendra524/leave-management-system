@@ -1,12 +1,49 @@
-import React, { useState } from 'react';
-import { DefaultFacultyResponse } from '../fixtures/api/DefaultFacultyResponse';
-import { StudentResponse } from '../types';
+import axios from 'axios';
+import { DateTime } from 'luxon';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import ErrorService from '../services/ErrorService';
+import { RootState, StudentApiResponse } from '../types';
+import { getAuthCookie } from '../utils/ApiUtils';
+import Logger from '../utils/Logger';
 import Button from './Button';
 import Layout from './Layout';
+import ResourceContainer from './ResourceContainer';
 
 const StudentDashboard = () => {
-  const [userRequest, setUserRequest] =
-    useState<Omit<StudentResponse, 'faculty_id' | 'leaves' | 'user_type'>>();
+  const token = getAuthCookie();
+  const [userRequest, setUserRequest] = useState<StudentApiResponse>();
+
+  Logger.log(userRequest);
+
+  const [isFetching, setIsFetching] = useState<boolean>(false);
+  const [studentId, setStudentId] = useState<number>();
+
+  const { facultyApplications } = useSelector((state: RootState) => state.auth);
+
+  const fetchStudentDetails = useCallback(async (id: number, token: string) => {
+    setIsFetching(true);
+    await axios({
+      method: 'get',
+      url: `https://leavemangement.onrender.com/apiv1/facultyaction/getstudent/${id}`,
+      headers: { Authorization: 'Bearer ' + token },
+    })
+      .then(async (res) => {
+        setUserRequest(res.data.data[0]);
+      })
+      .catch((e) => {
+        ErrorService.notify('Problem in fetching request token', e);
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (!!studentId && !!token) {
+      fetchStudentDetails(studentId, token);
+    }
+  }, [fetchStudentDetails, studentId, token]);
 
   return (
     <Layout>
@@ -17,75 +54,80 @@ const StudentDashboard = () => {
               My Student
             </h1>
           </div>
-          <table className='w-full'>
-            <tr>
-              <th>Student Name</th>
-              <th>Email</th>
-              <th>Phone Number</th>
-              <th>Degree</th>
-              <th>Department</th>
-              <th>Specialization</th>
-              <th>Entrance</th>
-            </tr>
-            {(DefaultFacultyResponse.request || []).map((user) => {
-              const {
-                request: { desc, from, status, title, to },
-                student: {
-                  student_name,
-                  degree,
-                  department,
-                  email_id,
-                  mobile_number,
-                  entrance,
-                  specialization,
-                  student_id,
-                },
-              } = user;
+          <div className='w-full'>
+            <div className='grid grid-cols-6 font-sans font-bold text-base uppercase p-4 bg-primary bg-opacity-20'>
+              <span>Title</span>
+              <span className='col-span-2'>Description</span>
+              <span>Leave From</span>
+              <span>Leave To</span>
+              <span>Status</span>
+            </div>
+            {facultyApplications.map((application) => {
               return (
                 <React.Fragment>
-                  <tr
+                  <div
                     onClick={() => {
-                      if (
-                        !!userRequest &&
-                        student_id === userRequest.student_id
-                      ) {
-                        setUserRequest(undefined);
-                      } else setUserRequest(user.student);
+                      if (studentId && studentId === application.s_id!) {
+                        setStudentId(undefined);
+                      } else {
+                        setStudentId(application.s_id!);
+                      }
                     }}
-                    className='w-full cursor-pointer'
+                    className='w-full cursor-pointer grid grid-cols-6 items-center justify-center p-4 font-sans font-normal text-base bg-dark-3 bg-opacity-20'
                   >
-                    <td>{student_name}</td>
-                    <td>{email_id}</td>
-                    <td>{mobile_number}</td>
-                    <td>{degree}</td>
-                    <td>{department}</td>
-                    <td>{specialization}</td>
-                    <td>{entrance}</td>
-                  </tr>
-                  {userRequest && userRequest.student_id === student_id && (
-                    <>
+                    <span>{application.leave_type}</span>
+                    <span className='col-span-2'>{application.reason}</span>
+                    <span>
+                      {DateTime.fromISO(application.starting_date).toFormat(
+                        'yyyy LLL dd'
+                      )}
+                    </span>
+                    <span>
+                      {DateTime.fromISO(application.ending_date).toFormat(
+                        'yyyy LLL dd'
+                      )}
+                    </span>
+                    <Button
+                      label={application.status}
+                      onClick={() => undefined}
+                    />
+                  </div>
+                  {studentId && studentId === application.s_id && (
+                    <ResourceContainer
+                      isEmpty={!userRequest}
+                      loading={isFetching}
+                      resourceName='user'
+                    >
                       <tr>
-                        <th>Title</th>
-                        <th>Description</th>
-                        <th>Leave From</th>
-                        <th>Leave To</th>
-                        <th>Status</th>
+                        <th>Student Name</th>
+                        <th>Roll No</th>
+                        <th>Email</th>
+                        <th>Phone Number</th>
+                        <th>Degree</th>
+                        <th>Department</th>
+                        <th>Specialization</th>
+                        <th>Entrance</th>
+                        <th>Remaining Casual Leaves</th>
+                        <th>Remaining Medical Leaves</th>
                       </tr>
                       <tr>
-                        <td>{title}</td>
-                        <td>{desc}</td>
-                        <td>{from}</td>
-                        <td>{to}</td>
-                        <td>
-                          <Button label={status} onClick={() => undefined} />
-                        </td>
+                        <td>{userRequest?.name}</td>
+                        <td>{userRequest?.roll_no}</td>
+                        <td>{userRequest?.email_id}</td>
+                        <td>{userRequest?.mobile_no}</td>
+                        <td>{userRequest?.degree}</td>
+                        <td>{userRequest?.department}</td>
+                        <td>{userRequest?.specialization}</td>
+                        <td>{userRequest?.entrance}</td>
+                        <td>{userRequest?.remaining_casual_leave}</td>
+                        <td>{userRequest?.remaining_medical_leave}</td>
                       </tr>
-                    </>
+                    </ResourceContainer>
                   )}
                 </React.Fragment>
               );
             })}
-          </table>
+          </div>
         </div>
       </div>
     </Layout>

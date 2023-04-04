@@ -99,9 +99,58 @@ export interface FacultyResponse {
 export interface AuthState {
   role?: UserTypeEnum;
   appLoading: boolean;
+  studentApplications: StudentApplicationsResponse[];
+  facultyApplications: FacultyApplicationResponse[];
 }
 
 export interface FacultyListResponse {
   id: string;
   name: string;
+}
+
+export interface StudentApplicationsResponse {
+  created_on: string;
+  document?: File;
+  document_attached?: number;
+  ending_date: string;
+  f_id: number;
+  id: number;
+  isdeleted: number;
+  leave_type: string;
+  no_of_leaves: number;
+  reason: string;
+  s_id: number;
+  starting_date: string;
+  status: string;
+  status_comment: string | null;
+}
+
+export interface FacultyApplicationResponse {
+  created_on: string;
+  document: File | null;
+  document_attached: number | null;
+  ending_date: string;
+  f_id: number;
+  id: number;
+  isdeleted: number;
+  leave_type: string;
+  no_of_leaves: number;
+  reason: string;
+  s_id: number;
+  starting_date: string;
+  status: string;
+  status_comment: string | null;
+}
+
+export interface StudentApiResponse {
+  degree: string;
+  department: string;
+  email_id: string;
+  entrance: string;
+  mobile_no: string;
+  name: string;
+  remaining_casual_leave: number;
+  remaining_medical_leave: number;
+  roll_no: string;
+  specialization: string;
 }
