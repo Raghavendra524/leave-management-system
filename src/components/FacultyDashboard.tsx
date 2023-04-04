@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
-import { FacultyResponse, RootState, StudentResponse } from '../types';
+import { DefaultFacultyResponse } from '../fixtures/api/DefaultFacultyResponse';
+import { StudentResponse } from '../types';
 import Button from './Button';
 import Layout from './Layout';
 
 const StudentDashboard = () => {
-  const {
-    userResponse: { data: userDetails },
-  } = useSelector((state: RootState) => state.auth);
-
   const [userRequest, setUserRequest] =
     useState<Omit<StudentResponse, 'faculty_id' | 'leaves' | 'user_type'>>();
 
@@ -31,7 +27,7 @@ const StudentDashboard = () => {
               <th>Specialization</th>
               <th>Entrance</th>
             </tr>
-            {((userDetails as FacultyResponse).request || []).map((user) => {
+            {(DefaultFacultyResponse.request || []).map((user) => {
               const {
                 request: { desc, from, status, title, to },
                 student: {

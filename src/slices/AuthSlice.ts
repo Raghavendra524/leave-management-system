@@ -1,32 +1,23 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import ErrorService from '../services/ErrorService';
-import {
-  AuthState,
-  AsyncResponse,
-  FacultyResponse,
-  StudentResponse,
-  AppThunk,
-} from '../types';
+import { AppThunk, AuthState, UserTypeEnum } from '../types';
 
 export const initialState: AuthState = {
-  userResponse: { name: 'details', loading: false },
+  role: undefined,
 };
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    saveUserResponse(
-      state,
-      action: PayloadAction<AsyncResponse<StudentResponse | FacultyResponse>>
-    ) {
-      state.userResponse = action.payload;
+    saveUserRoleResponse(state, action: PayloadAction<UserTypeEnum>) {
+      state.role = action.payload;
     },
   },
 });
 
-export const { saveUserResponse } = authSlice.actions;
+export const { saveUserRoleResponse } = authSlice.actions;
 
 export const getAllFacultyApplications =
   (token: string): AppThunk =>
@@ -37,7 +28,7 @@ export const getAllFacultyApplications =
         url: 'https://leavemangement.onrender.com/apiv1/facultyaction/allapplication',
         headers: { Authorization: 'Bearer ' + token },
       });
-      console.log('Data:', data);
+      dispatch(saveUserRoleResponse(data.role));
     } catch (e: any) {
       ErrorService.notify('Unable to fetch applications', e);
     }
@@ -52,7 +43,7 @@ export const getAllStudentApplications =
         url: 'https://leavemangement.onrender.com/apiv1/studentaction/applicationhistory',
         headers: { Authorization: 'Bearer ' + token },
       });
-      console.log('Data:', data);
+      dispatch(saveUserRoleResponse(data.role));
     } catch (e: any) {
       ErrorService.notify('Unable to fetch applications', e);
     }

@@ -94,6 +94,8 @@ export interface FacultyResponse {
   request: FacultyRequestResponse[];
 }
 
+
+
 export interface AuthState {
-  userResponse: AsyncResponse<StudentResponse | FacultyResponse>;
+  role?: UserTypeEnum;
 }

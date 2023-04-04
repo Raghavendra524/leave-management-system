@@ -10,6 +10,7 @@ import ErrorService from '../services/ErrorService';
 import {
   getAllFacultyApplications,
   getAllStudentApplications,
+  saveUserRoleResponse,
 } from '../slices/AuthSlice';
 import { AppDispatch } from '../types';
 import { setAuthCookie } from '../utils/ApiUtils';
@@ -45,6 +46,7 @@ const LoginScreen = () => {
           data: { token, role },
         } = res;
         setAuthCookie(token);
+        dispatch(saveUserRoleResponse(role));
         if (role === 'FACULTY') {
           dispatch(getAllFacultyApplications(token));
         } else if (role === 'STUDENT') {
@@ -56,8 +58,10 @@ const LoginScreen = () => {
         setValue('submit', e);
         ErrorService.notify('Problem in fetching request token', e);
       })
-      .finally(() => setIsSubmitting(false));
-    navigate('/');
+      .finally(() => {
+        setIsSubmitting(false);
+        navigate('/');
+      });
   };
 
   return (
