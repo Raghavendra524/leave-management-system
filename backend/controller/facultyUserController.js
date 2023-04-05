@@ -4,7 +4,7 @@ const validator = require("validator");
 const jwt = require("jsonwebtoken");
 
 const createToken = (id) => {
-  return jwt.sign({ id: id }, process.env.SECRETFORJWT, { expiresIn: "1d" });
+  return jwt.sign({ id: id, role: "FACULTY" }, process.env.SECRETFORJWT, { expiresIn: "1d" });
 };
 
 //helping login method for user
