@@ -20,7 +20,7 @@ app.use("/apiv1/student/", studentUserRoutes);
 app.use("/apiv1/faculty/", facultyUserRoutes);
 app.use("/apiv1/studentaction/", studentActionRoutes);
 app.use("/apiv1/facultyaction/", FacultyActionRoutes);
-app.use("api1/getdetails/",GetDetailsRoutes)
+app.use("/apiv1/getdetails/",GetDetailsRoutes)
 
 // listen for request
 app.listen(process.env.PORT, () => {
