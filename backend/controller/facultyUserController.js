@@ -41,20 +41,14 @@ const loginUser = async (req, res) => {
     const user = await login(email, password);
 
     const token = createToken(user);
-    res.status(200).json({ email, token });
+    res.status(200).json({ email, token, role: "FACULTY" });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 };
 
 // helping signup method for user
-const signup = async (
-  name,
-  mobile_no,
-  email,
-  password,
-  department,
-) => {
+const signup = async (name, mobile_no, email, password, department) => {
   // validation
   if (!email) {
     throw Error("email fields must be filled");
@@ -87,9 +81,9 @@ const signup = async (
     "insert into Faculty (name,mobile_no,email_id,password,department) values (?, ?, ?, ?, ?) ;";
   let values = [name, mobile_no, email, hash, department];
 
-//   console.log(values);
+  //   console.log(values);
   const id = await connection.query(sql, values);
-//   console.log(id);
+  //   console.log(id);
   return id.insertId;
 };
 
@@ -103,7 +97,7 @@ const signupUser = async (req, res) => {
     // console.log(user_id);
     const token = createToken(user_id);
 
-    res.status(200).json({ email, token });
+    res.status(200).json({ email, token, role: "FACULTY" });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
