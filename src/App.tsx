@@ -13,8 +13,6 @@ function App() {
 
   const { appLoading } = useSelector((state: RootState) => state.auth);
 
-  console.log('AppLoading', appLoading);
-
   const fetchAuth = useCallback(async () => {
     const token = getAuthCookie();
     if (!!token) {

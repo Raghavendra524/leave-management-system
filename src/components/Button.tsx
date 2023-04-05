@@ -43,9 +43,9 @@ const Button: React.FC<ButtonProps> = ({
     'primary-outline': 'ring-2 ring-primary bg-white text-primary',
     'primary-no-outline': 'ring-0 ring-white bg-white text-primary',
     secondary: 'ring-2 ring-dark-9 bg-dark-9 text-white',
-    'secondary-outline': 'ring-2 ring-dark-9 bg-white text-dark-9',
+    'secondary-outline': 'ring-2 ring-dark-9 bg-transparent text-dark-9',
     danger: 'ring-2 ring-danger bg-danger text-white',
-    'danger-outline': 'ring-2 ring-danger bg-white text-danger',
+    'danger-outline': 'ring-2 ring-danger bg-transparent text-danger',
     success: 'ring-2 ring-success bg-success text-white',
     'success-outline': 'ring-2 ring-success bg-white text-success',
   };

@@ -14,7 +14,6 @@ import {
 } from '../slices/AuthSlice';
 import { AppDispatch } from '../types';
 import { setAuthCookie } from '../utils/ApiUtils';
-import { PASSWORD_VALIDATIONS } from '../utils/validations';
 
 interface FormData {
   userIdOrEmail: string;
@@ -27,7 +26,8 @@ const LoginScreen = () => {
   const navigate = useNavigate();
   const dispatch: AppDispatch = useDispatch();
 
-  const { control, handleSubmit, setValue } = useForm<FormData>();
+  const { control, handleSubmit, setValue, watch } = useForm<FormData>();
+  const submitWatch = watch('submit');
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>();
 
@@ -56,12 +56,11 @@ const LoginScreen = () => {
         navigate('/');
       })
       .catch((e) => {
-        setValue('submit', e);
+        setValue('submit', e.response.data.error);
         ErrorService.notify('Problem in fetching request token', e);
       })
       .finally(() => {
         setIsSubmitting(false);
-        navigate('/');
       });
   };
 
@@ -72,6 +71,11 @@ const LoginScreen = () => {
           <h1 className='text-xl font-bold text-primary my-3 self-center'>
             Login
           </h1>
+          {submitWatch && (
+            <span className='text-danger font-medium text-center self-center'>
+              {submitWatch}
+            </span>
+          )}
           <div className='overflow-y-scroll w-full md:px-12 px-4'>
             <div className='mt-5'>
               <ControlledTextInput<FormData, 'userIdOrEmail'>
@@ -94,7 +98,6 @@ const LoginScreen = () => {
                 shouldUnregister={false}
                 rules={{
                   required: 'Please enter password',
-                  ...PASSWORD_VALIDATIONS,
                 }}
                 type='password'
                 isRequired

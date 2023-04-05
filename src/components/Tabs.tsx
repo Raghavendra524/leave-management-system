@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React, { Fragment } from 'react';
+import React from 'react';
 
 export type TabsVariant = 'default';
 
@@ -27,14 +27,14 @@ const Tabs: React.FC<TabsProps> = ({
   };
 
   const tabInActiveVariantClassMap: Record<TabsVariant, string> = {
-    default: 'font-bold text-dark-9 py-3 px-6 bg-white',
+    default: 'font-bold text-dark-9 py-3 px-6',
   };
 
   return (
     <div className='flex flex-col'>
       <div
         className={classNames(
-          'flex-grow overflow-x-auto flex flex-row space-x-3 bg-white shadow-sm sticky top-0'
+          'flex-grow overflow-x-auto flex flex-row space-x-3 bg-transparent shadow-sm sticky top-0'
         )}
       >
         {tabs.map(({ name }, index) => {
@@ -56,10 +56,7 @@ const Tabs: React.FC<TabsProps> = ({
           );
         })}
       </div>
-      <div
-        key={selectedIndex}
-        className='flex-grow bg-primary bg-opacity-10 overflow-y-scroll'
-      >
+      <div key={selectedIndex} className='flex-grow overflow-y-scroll'>
         {tabs[selectedIndex].TabComponent}
       </div>
     </div>
