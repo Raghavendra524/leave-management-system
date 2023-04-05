@@ -20,7 +20,10 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    saveUserRoleResponse(state, action: PayloadAction<UserTypeEnum>) {
+    saveUserRoleResponse(
+      state,
+      action: PayloadAction<UserTypeEnum | undefined>
+    ) {
       state.role = action.payload;
     },
     saveAppLoading(state, action: PayloadAction<boolean>) {

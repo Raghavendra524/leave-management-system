@@ -1,11 +1,17 @@
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import axios from 'axios';
 import { DateTime } from 'luxon';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ErrorService from '../services/ErrorService';
-import { RootState, StudentApiResponse } from '../types';
+import {
+  FacultyApplicationResponse,
+  RootState,
+  StudentApiResponse,
+} from '../types';
 import { getAuthCookie } from '../utils/ApiUtils';
-import Logger from '../utils/Logger';
+import ApproveLeaveModel from './ApproveLeaveModel';
 import Button from './Button';
 import Layout from './Layout';
 import ResourceContainer from './ResourceContainer';
@@ -13,11 +19,9 @@ import ResourceContainer from './ResourceContainer';
 const StudentDashboard = () => {
   const token = getAuthCookie();
   const [userRequest, setUserRequest] = useState<StudentApiResponse>();
-
-  Logger.log(userRequest);
-
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const [studentId, setStudentId] = useState<number>();
+  const [isModelOpen, setIsModalOpen] = useState<FacultyApplicationResponse>();
 
   const { facultyApplications } = useSelector((state: RootState) => state.auth);
 
@@ -65,17 +69,30 @@ const StudentDashboard = () => {
             {facultyApplications.map((application) => {
               return (
                 <React.Fragment>
-                  <div
-                    onClick={() => {
-                      if (studentId && studentId === application.s_id!) {
-                        setStudentId(undefined);
-                      } else {
-                        setStudentId(application.s_id!);
-                      }
-                    }}
-                    className='w-full cursor-pointer grid grid-cols-6 items-center justify-center p-4 font-sans font-normal text-base bg-dark-3 bg-opacity-20'
-                  >
-                    <span>{application.leave_type}</span>
+                  <div className='w-full cursor-pointer grid grid-cols-6 items-center justify-center p-4 font-sans font-normal text-base bg-dark-3 bg-opacity-20'>
+                    <span
+                      className='flex items-center relative'
+                      onClick={() => {
+                        if (studentId && studentId === application.s_id!) {
+                          setStudentId(undefined);
+                        } else {
+                          setStudentId(application.s_id!);
+                        }
+                      }}
+                    >
+                      {studentId && studentId === application.s_id ? (
+                        <ArrowDropUpIcon
+                          className='text-primary'
+                          fontSize='large'
+                        />
+                      ) : (
+                        <ArrowDropDownIcon
+                          className='text-primary'
+                          fontSize='large'
+                        />
+                      )}
+                      {application.leave_type}
+                    </span>
                     <span className='col-span-2'>{application.reason}</span>
                     <span>
                       {DateTime.fromISO(application.starting_date).toFormat(
@@ -87,10 +104,20 @@ const StudentDashboard = () => {
                         'yyyy LLL dd'
                       )}
                     </span>
-                    <Button
-                      label={application.status}
-                      onClick={() => undefined}
-                    />
+                    {application.status === 'approved' ? (
+                      <span className='text-success font-extrabold'>
+                        Accepted
+                      </span>
+                    ) : application.status === 'rejected' ? (
+                      <span className='text-danger font-extrabold'>
+                        Rejected
+                      </span>
+                    ) : (
+                      <Button
+                        label={application.status}
+                        onClick={() => setIsModalOpen(application)}
+                      />
+                    )}
                   </div>
                   {studentId && studentId === application.s_id && (
                     <ResourceContainer
@@ -130,6 +157,12 @@ const StudentDashboard = () => {
           </div>
         </div>
       </div>
+      {isModelOpen && (
+        <ApproveLeaveModel
+          application={isModelOpen}
+          onClose={() => setIsModalOpen(undefined)}
+        />
+      )}
     </Layout>
   );
 };

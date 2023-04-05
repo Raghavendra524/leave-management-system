@@ -1,11 +1,31 @@
-import React from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { saveUserRoleResponse } from '../slices/AuthSlice';
+import { deleteAuthCookie, getAuthCookie } from '../utils/ApiUtils';
+import Button from './Button';
 
 const Header = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const token = getAuthCookie();
+
   return (
-    <header className='w-full flex justify-center items-center bg-transparent px-4 py-5 border-b border-dark-light'>
+    <header className='relative w-full flex justify-center items-center bg-transparent px-4 py-5'>
       <h1 className='font-sans font-bold text-lg leading-5 text-dark-9'>
         Leave Management System
       </h1>
+      {token && (
+        <Button
+          label='Logout'
+          variant='danger-outline'
+          onClick={() => {
+            deleteAuthCookie();
+            dispatch(saveUserRoleResponse(undefined));
+            navigate('/');
+          }}
+          className='absolute right-[8.5%]'
+        />
+      )}
     </header>
   );
 };

@@ -294,7 +294,7 @@ const StudentRegisterScreen: React.FC<StudentRegisterScreenProps> = () => {
           <span>
             Already User?{' '}
             <button
-              onClick={() => navigate('/login')}
+              onClick={() => navigate('/login/student')}
               className='font-sans text-primary text-base leading-5 font-medium'
             >
               Login
