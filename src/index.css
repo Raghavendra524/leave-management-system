@@ -28,12 +28,8 @@ th {
   padding: 8px;
 }
 
-tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
 tr:hover {
-  background-color: #ddd;
+  background-color: #9a9a9a;
 }
 
 th {
@@ -41,7 +37,12 @@ th {
   padding-bottom: 12px;
   text-align: left;
   background-color: #3b82f6;
+  opacity: 0.3;
   color: white;
+  font-weight: 800;
+  text-transform: uppercase;
 }
+
+
 
 

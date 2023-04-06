@@ -1,6 +1,6 @@
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { saveUserRoleResponse } from '../slices/AuthSlice';
+import { saveAuthUserDetails } from '../slices/AuthSlice';
 import { deleteAuthCookie, getAuthCookie } from '../utils/ApiUtils';
 import Button from './Button';
 
@@ -20,7 +20,7 @@ const Header = () => {
           variant='danger-outline'
           onClick={() => {
             deleteAuthCookie();
-            dispatch(saveUserRoleResponse(undefined));
+            dispatch(saveAuthUserDetails(undefined));
             navigate('/');
           }}
           className='absolute right-[8.5%]'

@@ -20,8 +20,11 @@ const StudentDashboard = () => {
   const token = getAuthCookie();
   const [userRequest, setUserRequest] = useState<StudentApiResponse>();
   const [isFetching, setIsFetching] = useState<boolean>(false);
-  const [studentId, setStudentId] = useState<number>();
+  const [userReference, setUserReference] =
+    useState<FacultyApplicationResponse>();
   const [isModelOpen, setIsModalOpen] = useState<FacultyApplicationResponse>();
+
+  const { s_id: studentId, id: applicationId } = userReference || {};
 
   const { facultyApplications } = useSelector((state: RootState) => state.auth);
 
@@ -73,14 +76,14 @@ const StudentDashboard = () => {
                     <span
                       className='flex items-center relative'
                       onClick={() => {
-                        if (studentId && studentId === application.s_id!) {
-                          setStudentId(undefined);
+                        if (applicationId && applicationId === application.id) {
+                          setUserReference(undefined);
                         } else {
-                          setStudentId(application.s_id!);
+                          setUserReference(application);
                         }
                       }}
                     >
-                      {studentId && studentId === application.s_id ? (
+                      {applicationId && applicationId === application.id ? (
                         <ArrowDropUpIcon
                           className='text-primary'
                           fontSize='large'
@@ -119,7 +122,7 @@ const StudentDashboard = () => {
                       />
                     )}
                   </div>
-                  {studentId && studentId === application.s_id && (
+                  {applicationId && applicationId === application.id && (
                     <ResourceContainer
                       isEmpty={!userRequest}
                       loading={isFetching}

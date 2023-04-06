@@ -6,12 +6,15 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import ControlledDatePickerInput from '../components/controlled-inputs/ControlledDatePickerInput';
+import ZenControlledFileUploadInput from '../components/controlled-inputs/ControlledFileUploadInput';
+import ControlledHTMLSelectInput from '../components/controlled-inputs/ControlledHTMLSelectInput';
 import ControlledTextInput from '../components/controlled-inputs/ControlledTextInput';
 import Layout from '../components/Layout';
 import ErrorService from '../services/ErrorService';
 import { getAllStudentApplications } from '../slices/AuthSlice';
 import { AppDispatch } from '../types';
 import { getAuthCookie } from '../utils/ApiUtils';
+import { capitalizeEnum } from '../utils/StringUtils';
 
 interface FormData {
   leave_type: string;
@@ -26,8 +29,13 @@ const ApplyLeave = () => {
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
   const token = getAuthCookie();
-  const { control, handleSubmit } = useForm<FormData>();
+  const { control, handleSubmit, watch } = useForm<FormData>();
   const [isSubmitting, setIsSubmitting] = useState<boolean>();
+
+  const [watchLeaveType, watchNoOfLeaves] = watch([
+    'leave_type',
+    'no_of_leaves',
+  ]);
 
   const onSubmit = async (formData: FormData) => {
     setIsSubmitting(true);
@@ -59,11 +67,22 @@ const ApplyLeave = () => {
           </h1>
           <div className='overflow-y-scroll w-full md:px-12 px-4'>
             <div className='mt-5'>
-              <ControlledTextInput<FormData, 'leave_type'>
+              <ControlledHTMLSelectInput<FormData, 'leave_type'>
                 name='leave_type'
                 label='Leave Type'
                 control={control}
                 placeholder='Leave Type'
+                options={[
+                  { label: 'Select', value: '' },
+                  ...[
+                    'medical_leave',
+                    'casual_leave',
+                    'permission_to_attend_conference',
+                  ].map((type) => ({
+                    label: capitalizeEnum(type),
+                    value: type,
+                  })),
+                ]}
                 shouldUnregister={false}
                 rules={{
                   required: 'Please enter leave type',
@@ -71,6 +90,17 @@ const ApplyLeave = () => {
                 isRequired
               />
             </div>
+            {watchLeaveType && watchLeaveType === 'medical_leave' && (
+              <div className='mt-5'>
+                <ZenControlledFileUploadInput<FormData, 'document'>
+                  name='document'
+                  control={control}
+                  label='Medical Document'
+                  placeholder='upload a doc'
+                />
+              </div>
+            )}
+
             <div className='mt-5'>
               <ControlledTextInput<FormData, 'no_of_leaves'>
                 name='no_of_leaves'
@@ -78,15 +108,18 @@ const ApplyLeave = () => {
                 control={control}
                 placeholder='No of Leaves'
                 inputMode='numeric'
-                maxLength={2}
+                maxLength={1}
                 type='number'
                 shouldUnregister={false}
                 rules={{
                   required: 'Please enter no of leaves',
                   validate: async (v) => {
-                    return v < 0
-                      ? 'value should be greater than zero'
-                      : undefined;
+                    if (v > 8) {
+                      return 'value should be greater than eight days';
+                    } else if (v < 0) {
+                      return 'value should be greater than zero';
+                    }
+                    return undefined;
                   },
                 }}
                 isRequired
@@ -116,7 +149,10 @@ const ApplyLeave = () => {
                 shouldUnregister={false}
                 placeholder='E.g. 10/26'
                 datePickerConfig={{
-                  minDate: DateTime.local().plus({ day: 1 }).toJSDate(),
+                  minDate: DateTime.local().toJSDate(),
+                  maxDate: DateTime.local()
+                    .plus({ day: !!watchNoOfLeaves ? watchNoOfLeaves : 1 })
+                    .toJSDate(),
                 }}
                 rules={{
                   required: 'please select end date',

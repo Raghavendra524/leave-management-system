@@ -1,16 +1,38 @@
+import DeleteIcon from '@mui/icons-material/Delete';
+import axios from 'axios';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { RootState } from '../types';
+import ErrorService from '../services/ErrorService';
+import { getAllStudentApplications } from '../slices/AuthSlice';
+import { AppDispatch, RootState } from '../types';
+import { getAuthCookie } from '../utils/ApiUtils';
 import { capitalizeEnum } from '../utils/StringUtils';
 import Button from './Button';
 import Layout from './Layout';
 
 const StudentDashboard = () => {
+  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
+  const token = getAuthCookie();
 
   const { studentApplications } = useSelector((state: RootState) => state.auth);
+
+  const handleDelete = async (id: number) => {
+    await axios({
+      method: 'post',
+      url: 'https://leavemangement.onrender.com/apiv1/studentaction/deleteapplication',
+      data: { leave_application_id: id },
+      headers: { Authorization: 'Bearer ' + token },
+    })
+      .then(async (res) => {
+        dispatch(getAllStudentApplications(token!, false, false));
+      })
+      .catch((e) => {
+        ErrorService.notify('problem in deleting leave application', e);
+      });
+  };
 
   return (
     <Layout>
@@ -32,11 +54,12 @@ const StudentDashboard = () => {
               <th>Leave From</th>
               <th>Leave To</th>
               <th>Status</th>
+              <th>Actions</th>
             </tr>
             {(studentApplications || []).map((leave) => {
               return (
                 <tr>
-                  <td>{leave.leave_type}</td>
+                  <td>{capitalizeEnum(leave.leave_type)}</td>
                   <td>{leave.reason}</td>
                   <td>
                     {DateTime.fromISO(leave.starting_date).toFormat(
@@ -50,10 +73,22 @@ const StudentDashboard = () => {
                   </td>
                   <td
                     className={classNames(
-                      leave.status === 'pending' && 'text-danger'
+                      'font-mono font-semibold text-base',
+                      leave.status === 'pending'
+                        ? 'text-warning-dark'
+                        : leave.status === 'rejected'
+                        ? 'text-danger'
+                        : 'text-success-dark'
                     )}
                   >
                     {capitalizeEnum(leave.status)}
+                  </td>
+                  <td className='flex items-center justify-center'>
+                    <DeleteIcon
+                      className='text-danger cursor-pointer'
+                      fontSize='medium'
+                      onClick={() => handleDelete(leave.id)}
+                    />
                   </td>
                 </tr>
               );

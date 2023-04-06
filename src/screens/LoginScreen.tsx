@@ -7,11 +7,7 @@ import Button from '../components/Button';
 import ControlledTextInput from '../components/controlled-inputs/ControlledTextInput';
 import Layout from '../components/Layout';
 import ErrorService from '../services/ErrorService';
-import {
-  getAllFacultyApplications,
-  getAllStudentApplications,
-  saveUserRoleResponse,
-} from '../slices/AuthSlice';
+import { fetchUserDetails } from '../slices/AuthSlice';
 import { AppDispatch } from '../types';
 import { setAuthCookie } from '../utils/ApiUtils';
 
@@ -44,15 +40,10 @@ const LoginScreen = () => {
     })
       .then(async (res) => {
         const {
-          data: { token, role },
+          data: { token },
         } = res;
         setAuthCookie(token);
-        dispatch(saveUserRoleResponse(role));
-        if (role === 'FACULTY') {
-          dispatch(getAllFacultyApplications(token));
-        } else if (role === 'STUDENT') {
-          dispatch(getAllStudentApplications(token));
-        }
+        dispatch(fetchUserDetails(token));
         navigate('/');
       })
       .catch((e) => {

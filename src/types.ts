@@ -97,8 +97,8 @@ export interface FacultyResponse {
 
 
 export interface AuthState {
-  role?: UserTypeEnum;
-  appLoading: boolean;
+  authUserLoading: boolean;
+  authUserResponse?: AuthUserResponse;
   studentApplications: StudentApplicationsResponse[];
   facultyApplications: FacultyApplicationResponse[];
 }
@@ -153,4 +153,18 @@ export interface StudentApiResponse {
   remaining_medical_leave: number;
   roll_no: string;
   specialization: string;
+}
+
+export interface AuthUserResponse {
+  role: UserTypeEnum;
+  data: {
+    id: number;
+    name: string;
+    mobile_no: string;
+    email_id: string;
+    password: string;
+    department: BranchesEnum;
+    created_on: string;
+    isdeleted: 0;
+  };
 }

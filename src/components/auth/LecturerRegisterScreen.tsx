@@ -1,12 +1,10 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import ErrorService from '../../services/ErrorService';
-import { getAllFacultyApplications } from '../../slices/AuthSlice';
-import { AppDispatch, BranchesEnum } from '../../types';
-import { setAuthCookie } from '../../utils/ApiUtils';
+import { BranchesEnum } from '../../types';
+import Logger from '../../utils/Logger';
 import { capitalizeEnum } from '../../utils/StringUtils';
 import {
   EMAIL_VALIDATIONS,
@@ -30,7 +28,6 @@ interface FormData {
 }
 
 const LecturerRegisterScreen: React.FC<LecturerRegisterScreenProps> = () => {
-  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
   const { control, handleSubmit, getValues, setValue } = useForm<FormData>();
 
@@ -52,13 +49,12 @@ const LecturerRegisterScreen: React.FC<LecturerRegisterScreenProps> = () => {
       },
     })
       .then(async (res) => {
-        setAuthCookie(res.data.token);
-        dispatch(getAllFacultyApplications(res.data.token));
+        Logger.debug('Status:', res.data);
         navigate('/');
       })
       .catch((e) => {
         setValue('submit', e);
-        ErrorService.notify('Problem in fetching request token', e);
+        ErrorService.notify('Problem in registering user', e);
       })
       .finally(() => setIsSubmitting(false));
   };

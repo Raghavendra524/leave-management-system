@@ -4,14 +4,15 @@ import ErrorService from '../services/ErrorService';
 import {
   AppThunk,
   AuthState,
+  AuthUserResponse,
   FacultyApplicationResponse,
   StudentApplicationsResponse,
   UserTypeEnum,
 } from '../types';
 
 export const initialState: AuthState = {
-  role: undefined,
-  appLoading: false,
+  authUserLoading: false,
+  authUserResponse: undefined,
   studentApplications: [],
   facultyApplications: [],
 };
@@ -20,14 +21,14 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    saveUserRoleResponse(
-      state,
-      action: PayloadAction<UserTypeEnum | undefined>
-    ) {
-      state.role = action.payload;
+    saveAuthUserLoading(state, action: PayloadAction<boolean>) {
+      state.authUserLoading = action.payload;
     },
-    saveAppLoading(state, action: PayloadAction<boolean>) {
-      state.appLoading = action.payload;
+    saveAuthUserDetails(
+      state,
+      action: PayloadAction<AuthUserResponse | undefined>
+    ) {
+      state.authUserResponse = action.payload;
     },
     saveStudentApplications(
       state,
@@ -45,11 +46,37 @@ const authSlice = createSlice({
 });
 
 export const {
-  saveUserRoleResponse,
-  saveAppLoading,
+  saveAuthUserLoading,
+  saveAuthUserDetails,
   saveStudentApplications,
   saveFacultyApplications,
 } = authSlice.actions;
+
+export const fetchUserDetails =
+  (token: string): AppThunk =>
+  async (dispatch) => {
+    dispatch(saveAuthUserLoading(true));
+    try {
+      const { data } = await axios({
+        method: 'get',
+        url: 'https://leavemangement.onrender.com/apiv1/getDetails',
+        headers: { Authorization: 'Bearer ' + token },
+      });
+      dispatch(saveAuthUserDetails(data));
+
+      console.log('Data:', data);
+
+      if (data.role === UserTypeEnum.FACULTY) {
+        dispatch(getAllFacultyApplications(token));
+      } else if (data.role === UserTypeEnum.STUDENT) {
+        dispatch(getAllStudentApplications(token));
+      }
+    } catch (e: any) {
+      ErrorService.notify('Unable to fetch applications', e);
+    } finally {
+      dispatch(saveAuthUserLoading(false));
+    }
+  };
 
 export const getAllFacultyApplications =
   (token: string): AppThunk =>
@@ -60,7 +87,6 @@ export const getAllFacultyApplications =
         url: 'https://leavemangement.onrender.com/apiv1/facultyaction/allapplication',
         headers: { Authorization: 'Bearer ' + token },
       });
-      dispatch(saveUserRoleResponse(data.role));
       dispatch(saveFacultyApplications(data.data));
     } catch (e: any) {
       ErrorService.notify('Unable to fetch applications', e);
@@ -68,24 +94,20 @@ export const getAllFacultyApplications =
   };
 
 export const getAllStudentApplications =
-  (token: string, onFetch?: boolean): AppThunk =>
+  (token: string, onFetch?: boolean, appLoading: boolean = true): AppThunk =>
   async (dispatch) => {
-    dispatch(saveAppLoading(true));
     try {
       const { data } = await axios({
         method: 'get',
         url: 'https://leavemangement.onrender.com/apiv1/studentaction/applicationhistory',
         headers: { Authorization: 'Bearer ' + token },
       });
-      dispatch(saveUserRoleResponse(data.role));
       dispatch(saveStudentApplications(data.data));
     } catch (e: any) {
       if (onFetch) {
         dispatch(getAllFacultyApplications(token));
       }
       ErrorService.notify('Unable to fetch applications', e);
-    } finally {
-      dispatch(saveAppLoading(false));
     }
   };
 

@@ -5,13 +5,13 @@ import { RootState, UserTypeEnum } from '../types';
 import Route404 from './Route404';
 
 const HomeScreen = () => {
-  const { role } = useSelector((state: RootState) => state.auth);
+  const { authUserResponse } = useSelector((state: RootState) => state.auth);
 
-  if (role === UserTypeEnum.STUDENT) {
+  if (authUserResponse?.role === UserTypeEnum.STUDENT) {
     return <StudentDashboard />;
   }
 
-  if (role === UserTypeEnum.FACULTY) {
+  if (authUserResponse?.role === UserTypeEnum.FACULTY) {
     return <FacultyDashboard />;
   }
 

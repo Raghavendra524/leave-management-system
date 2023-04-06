@@ -1,12 +1,10 @@
 import axios from 'axios';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import ErrorService from '../../services/ErrorService';
-import { getAllStudentApplications } from '../../slices/AuthSlice';
-import { AppDispatch, BranchesEnum, FacultyListResponse } from '../../types';
-import { setAuthCookie } from '../../utils/ApiUtils';
+import { BranchesEnum, FacultyListResponse } from '../../types';
+import Logger from '../../utils/Logger';
 import { getSpecializationValues } from '../../utils/RegisterUtils';
 import { capitalizeEnum } from '../../utils/StringUtils';
 import {
@@ -36,7 +34,6 @@ interface FormData {
 }
 
 const StudentRegisterScreen: React.FC<StudentRegisterScreenProps> = () => {
-  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
   const { control, handleSubmit, getValues, watch, setValue } =
     useForm<FormData>();
@@ -80,13 +77,12 @@ const StudentRegisterScreen: React.FC<StudentRegisterScreenProps> = () => {
       },
     })
       .then(async (res) => {
-        setAuthCookie(res.data.token);
-        dispatch(getAllStudentApplications(res.data.token));
+        Logger.debug('Status:', res.data);
         navigate('/');
       })
       .catch((e) => {
         setValue('submit', e);
-        ErrorService.notify('Problem in fetching request token', e);
+        ErrorService.notify('Problem in registering the user', e);
       })
       .finally(() => setIsSubmitting(false));
   };

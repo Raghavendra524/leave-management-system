@@ -6,11 +6,17 @@ import AuthRoutes from './AuthRoutes';
 import GuestRoutes from './GuestRoutes';
 
 const DecideAuthRoutes: React.FC = () => {
-  const { role } = useSelector((state: RootState) => state.auth);
+  const { authUserResponse } = useSelector((state: RootState) => state.auth);
+
+  console.log('User', authUserResponse);
+  
 
   return (
     <Routes>
-      <Route path='*' element={!!role ? <AuthRoutes /> : <GuestRoutes />} />
+      <Route
+        path='*'
+        element={!!authUserResponse ? <AuthRoutes /> : <GuestRoutes />}
+      />
     </Routes>
   );
 };
