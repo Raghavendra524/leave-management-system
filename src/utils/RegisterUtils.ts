@@ -2,8 +2,8 @@ import { BranchesEnum, ISelectOption } from '../types';
 
 export const getSpecializationValues: Record<BranchesEnum, ISelectOption[]> = {
   [BranchesEnum.CSE]: [
-    { label: 'CSIS', value: 'CSIS' },
-    { label: 'CS', value: 'CS' },
+    { label: 'COMPUTER SCIENCE (INFORMATION SECURITY)', value: 'CSIS' },
+    { label: 'COMPUTER SCIENCE & ENGINEERING', value: 'CS' },
   ],
   [BranchesEnum.ECE]: [
     { label: 'VLSI', value: 'VLSI' },

@@ -114,7 +114,7 @@ const StudentRegisterScreen: React.FC<StudentRegisterScreenProps> = () => {
           <div className='mt-5'>
             <ControlledTextInput<FormData, 'studentId'>
               name='studentId'
-              label='Student Id'
+              label='NITC Roll Number'
               control={control}
               placeholder='Please enter Id'
               shouldUnregister={false}
@@ -200,7 +200,7 @@ const StudentRegisterScreen: React.FC<StudentRegisterScreenProps> = () => {
               options={[
                 { label: 'Select', value: '' },
                 ...(faculty || []).map((fac) => ({
-                  label: fac.name,
+                  label: capitalizeEnum(fac.name)!,
                   value: fac.id,
                 })),
               ]}
@@ -232,7 +232,7 @@ const StudentRegisterScreen: React.FC<StudentRegisterScreenProps> = () => {
                 ...getSpecializationValues[
                   (spyDepartment as unknown as BranchesEnum) ?? BranchesEnum.CSE
                 ].map((spe) => ({
-                  label: capitalizeEnum(spe.label)!,
+                  label: spe.label,
                   value: spe.value,
                 })),
               ]}
@@ -248,8 +248,10 @@ const StudentRegisterScreen: React.FC<StudentRegisterScreenProps> = () => {
               rules={{ required: 'Please select your entrance' }}
               options={[
                 { label: 'Select', value: '' },
-                { label: 'Gate', value: 'GATE' },
-                { label: 'Self-sponsored', value: 'SELF_SPONSORED' },
+                { label: 'GATE', value: 'GATE' },
+                { label: 'QIP', value: 'QIP' },
+                { label: 'QIP(Poly)', value: 'QIP(Poly)' },
+                { label: 'SELF-SPONSORED', value: 'SELF_SPONSORED' },
               ]}
               isRequired
             />

@@ -154,15 +154,22 @@ const tempDeleteApplicationForm = async (req, res) => {
     console.log(leave_obj);
 
     try {
-      sql = `update Leave_Application set isdeleted = 1 where id = ?`;
-      const delete_leave_obj = await connection.query(
-        sql,
-        leave_application_id
-      );
-      res.status(200).json({
-        deleted: true,
-        data: `leave application of type ${leave_obj.leave_type} from ${leave_obj.starting_date} to ${leave_obj.ending_date} for reason [${leave_obj.reason}] is deleted.`,
-      });
+      if (leave_obj.status === "pending") {
+        sql = `update Leave_Application set isdeleted = 1 where id = ?`;
+        const delete_leave_obj = await connection.query(
+          sql,
+          leave_application_id
+        );
+        res.status(200).json({
+          deleted: true,
+          data: `leave application of type ${leave_obj.leave_type} from ${leave_obj.starting_date} to ${leave_obj.ending_date} for reason [${leave_obj.reason}] is deleted.`,
+        });
+      } else {
+        res.status(200).json({
+          deleted: false,
+          data: `you can't delete this leave because it is updated to ${leave_obj.status}.`,
+        });
+      }
     } catch (err) {
       throw Error("can't deleted " + err);
     }
