@@ -2,7 +2,7 @@ var connection = require("../connection").databaseConnection;
 
 // get all pending application
 const getPendingApplication = async (req, res) => {
-  let sql = `select * from Leave_Application where status="pending" and f_id = ? and isdeleted = 0;`;
+  let sql = `select * from Leave_Application join Student on Student.id = Leave_Application.s_id where status="pending" and f_id = ? and isdeleted = 0;`;
   try {
     let ans = await connection.query(sql, req.Facultyuser);
     res.json({ data: ans[0] });
@@ -99,6 +99,18 @@ const getStudentInfo = async (req, res) => {
     res.status(400).json({ error: err });
   }
 };
+// get a student leave info
+
+const getStudentLeaveInfo = async (req, res) => {
+  const { id } = req.params;
+  try {
+    let sql = `select * from  Leave_Application join Student on Student.id = Leave_Application.s_id where s_id = ? and f_id = ?;`;
+    let ans = await connection.query(sql, [id, req.Facultyuser]);
+    res.json({ data: ans[0] });
+  } catch (err) {
+    res.status(400).json({ error: err });
+  }
+};
 
 // delete all the leave application permenetally belonging to faculty
 const deleteAllApplicationForm = async (req, res) => {
@@ -123,4 +135,5 @@ module.exports = {
   updateStatusOfLeaveApplication,
   getStudentInfo,
   deleteAllApplicationForm,
+  getStudentLeaveInfo,
 };
